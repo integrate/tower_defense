@@ -1,4 +1,4 @@
-import pygame
+import sys,pygame
 import model
 
 def control():
@@ -6,4 +6,4 @@ def control():
     events = pygame.event.get()
     for e in events:
         if e.type == pygame.QUIT:
-            exit()
+            sys.exit(0)
