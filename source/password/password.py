@@ -1,13 +1,17 @@
-import sys, pygame
+import sys, pygame, os
 
 STATUS_OK = 0
+STATUS_OK_CACHE = 3
+
 STATUS_CANCEL = 1
 STATUS_TOO_MANY_ATTEMPTS = 2
 
 
 class Password():
-    def __init__(self, correct_pass, max_attempts, ok_callback, cancel_callback):
+    def __init__(self, correct_pass, max_attempts, ok_callback, cancel_callback, cache_file = "None"):
         pygame.init()
+
+        self.cache_file = cache_file
 
         self.max_attepts = max_attempts
         self.attempts_failed = 0
@@ -32,6 +36,33 @@ class Password():
         self.error_text = ""
         self.error_timer_event_code = pygame.event.custom_type()
         self.error_timer_processor = None
+
+        self._check_cache()
+
+    def _check_cache(self):
+        if self.cache_file is not None:
+            try:
+                file = open(self.cache_file, "r")
+                p = file.read()
+            except:
+                return
+
+            file.close()
+            if p == self.correct_pass:
+                self._ok(STATUS_OK_CACHE)
+
+
+    def _make_cache(self, p):
+        if self.cache_file is not None:
+            try:
+                os.makedirs(os.path.dirname(self.cache_file), exist_ok=True)
+                file = open(self.cache_file, "w+")
+                file.write(str(p))
+            except Exception as e:
+                print(e.args)
+                return
+            else:
+                file.close()
 
     def draw(self):
         pygame.draw.rect(self.screen, [14, 61, 52], self.window_rect, 0, 20)
@@ -91,13 +122,14 @@ class Password():
     def _ok(self, status):
         self.result_status = status
         if callable(self.ok_callback):
-            self.ok_callback()
+            self.ok_callback(status)
 
     def check_answer(self):
         if self.answer != self.correct_pass:
             self.attempts_failed += 1
             self._show_error("НЕПРАВИЛЬНЫЙ ПАРОЛЬ", 2000, self._incorrect_warning_timer)
         else:
+            self._make_cache(self.answer)
             self._ok(STATUS_OK)
 
     def _show_error(self, text, delay, timer_processor):

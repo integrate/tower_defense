@@ -3,7 +3,7 @@ import time, pygame
 from .password import *
 
 
-def start(correct_pass, max_attempts = 5, process_window_close = False):
+def start(correct_pass, max_attempts = 5, process_window_close = False, cache_file = None):
 
     # view
     screen = pygame.display.get_surface()
@@ -12,7 +12,7 @@ def start(correct_pass, max_attempts = 5, process_window_close = False):
         pygame.display.set_caption("Пароль")
 
     result = None
-    def ok_callback():
+    def ok_callback(status):
         nonlocal result
         result = True
 
@@ -20,7 +20,7 @@ def start(correct_pass, max_attempts = 5, process_window_close = False):
         nonlocal result
         result = False
 
-    password = Password(correct_pass, max_attempts, ok_callback, cancel_callback)
+    password = Password(correct_pass, max_attempts, ok_callback, cancel_callback, cache_file)
     while result is None:
         time.sleep(1/100)
 
