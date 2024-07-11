@@ -8,7 +8,7 @@ STATUS_TOO_MANY_ATTEMPTS = 2
 
 
 class Password():
-    def __init__(self, correct_pass, max_attempts, ok_callback, cancel_callback, cache_file = "None"):
+    def __init__(self, correct_pass, max_attempts, ok_callback, cancel_callback, cache_file = None):
         pygame.init()
 
         self.cache_file = cache_file
